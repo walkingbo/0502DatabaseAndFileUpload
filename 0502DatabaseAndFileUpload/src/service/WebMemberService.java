@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONObject;
 
+import domain.WebMember;
+
 //비지니스 로직 처리를 위한 메소드의 원형을 가지는 인터페이스 	
 public interface WebMemberService {
 	//id 중복 체크를 위한 메소드
@@ -17,5 +19,6 @@ public interface WebMemberService {
 	public JSONObject nicknamecheck(HttpServletRequest request);
 	//회원가입을 처리하는 메소드
 	public int insertuser(HttpServletRequest request);
-
+	//로그인 처리를 위한메소드
+	public WebMember login(HttpServletRequest request);
 }

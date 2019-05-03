@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONObject;
+import org.mindrot.jbcrypt.BCrypt;
 
 import domain.WebMember;
 import service.WebMemberDAO;
@@ -81,12 +82,56 @@ public class WebMemberServiceImpl implements WebMemberService {
 			
 			WebMember webMember = new WebMember();
 			webMember.setId(id);
-			webMember.setPw(pw);
+			//비밀번호를 그대로 저장
+			//webMember.setPw(pw);
+			
+			//비밀번호를 암호화 해서 저장
+			webMember.setPw(BCrypt.hashpw(pw, BCrypt.gensalt(10)));
+			
 			webMember.setNickname(nickname);
 			
 			result = webMemberDAO.insertuser(webMember);
 			
+			
+			//Commit과 Rollback은 Database 작업이지만
+			//DAO에서 하는 것이 아니고 Service에서 수행 합니다.
+			//하나의 거래는 Service가 처리하기 때문입니다.	
+			try{
+				con.commit();
+			}catch(Exception e) {
+				System.out.println("삽입완료:"+e.getMessage());
+			}
+			
+			
+			
 			return result;
+		}
+
+		@Override
+		public WebMember login(HttpServletRequest request) {
+		 WebMember webMember = null;
+			 
+		 String id = request.getParameter("id");
+		 String pw = request.getParameter("pw");
+		 
+		 //DAO 메소드 호출
+		 webMember = webMemberDAO.login(id.toUpperCase().trim());
+		 if(webMember != null) {
+			 //로그인 성공- 암호화된 비밀번호와 일치하는지 확인
+			 if(BCrypt.checkpw(pw, webMember.getPw())) {
+				 //비밀번호는 저장할 필요가 없기 때문에 삭제
+				 webMember.setPw(null);
+			 }else {
+				 webMember = null;
+			 }
+			 
+		 }
+		 //로그인에 성공하면 세션에 id와 그 이외 필요한 정보를 저장
+		 //로그인 된 경우는 session에 webMember에 데이터가 저장
+		 //로그인 안된 경우는 session에 webMember 가 null
+		 request.getSession().setAttribute("webMember", webMember);
+		 
+			return webMember;
 		}
 	}
 	

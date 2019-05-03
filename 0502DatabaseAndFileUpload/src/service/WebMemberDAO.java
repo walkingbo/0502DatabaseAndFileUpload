@@ -16,4 +16,8 @@ public interface WebMemberDAO {
 	//회원가입을 처리하는 메소드
 	public int insertuser(WebMember webMember);
 	
+	//로그인을 처리하기 위한 메소드
+	public WebMember login(String id);
+	
+	
 }

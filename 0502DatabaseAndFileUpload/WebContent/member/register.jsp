@@ -96,6 +96,39 @@
 				}
 			});
 		});
+		
+		//폼의 데이터를 전송하고자 할 때 	
+		registerform.addEventListener("submit",function(e){
+			//id 중복 검사 결과 확인
+			if(idcheck == false){
+				idmsg.innerHTML = "아이디 중복검사를 수행해야 합니다."
+				//폼의 데이터 전송을 하지 않도록 설정
+				e.preventDefault()	
+			}
+			
+			//nickname 중복검사 결과 확인
+			if(nicknamecheck == false){
+				nicknamemsg.innerHTML = "닉네임 중복검사를 수행해야 합니다."
+				//폼의 데이터 전송을 하지 않도록 설정
+				e.preventDefault()	
+			}
+			
+			//비밀번호 일치 여부 확인
+			if(pw.value !== pwconfirm.value){
+				pwmsg.innerHTML = "2개의 값은 일치해야 합니다."
+				e.preventDefault()	
+			}else{
+				pwmsg.innerHTML = ""
+				registerform.submit();
+			}
+			
+			
+		});
+		
+		
+		
+		
+		
 	</script>
 	
 	

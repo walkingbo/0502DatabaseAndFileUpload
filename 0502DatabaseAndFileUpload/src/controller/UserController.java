@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
 
+import domain.WebMember;
 import service.WebMemberService;
 import serviceimpl.WebMemberServiceImpl;
 
@@ -37,8 +38,6 @@ public class UserController extends HttpServlet {
 		String requestURI = request.getRequestURI();
 		String contextPath = request.getContextPath();
 		String command = requestURI.substring(contextPath.length()+1);
-		System.out.println("요청방식 URL:"+command);
-		System.out.println("요청방식:"+request.getMethod());
 		
 		//포워딩에 사용할 변수
 		RequestDispatcher dispatcher = null;
@@ -53,9 +52,10 @@ public class UserController extends HttpServlet {
 				dispatcher = request.getRequestDispatcher("../member/register.jsp");
 				dispatcher.forward(request, response);
 			}else {
+				System.out.println("회원가입 요청처리");
 				int result = webMemberService.insertuser(request);
 				if(result>0) {
-					response.sendRedirect("로그인 페이지 요청");
+					response.sendRedirect("login");
 				}else {
 					response.sendRedirect("register");
 
@@ -84,6 +84,40 @@ public class UserController extends HttpServlet {
 			dispatcher = request.getRequestDispatcher("../member/nicknamecheck.jsp");
 			dispatcher.forward(request, response);
 			break;
+			
+		case "user/login":	
+			if(request.getMethod().contentEquals("GET")) {
+			//출력할 결과 페이지로 포워딩
+			dispatcher = request.getRequestDispatcher("../member/login.jsp");
+			dispatcher.forward(request, response);
+			}else {
+				WebMember webMember =
+						webMemberService.login(request);
+				if(webMember == null) {
+					//로그인에 실패했을 때는 로그인 페이지로 이동
+					response.sendRedirect("login");
+				}else {
+					//로그인 성공했을때는 	
+					response.sendRedirect("content");
+				}
+			}
+			
+			break;
+			
+		case "user/content":
+			//출력할 결과 페이지로 포워딩
+			dispatcher = request.getRequestDispatcher("../member/content.jsp");
+			dispatcher.forward(request, response);
+			
+			break;
+			
+		case "user/logout":
+			request.getSession().invalidate();
+			response.sendRedirect("login");
+			
+			break;
+			
+			
 		}
 		
 	}
